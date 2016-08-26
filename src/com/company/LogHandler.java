@@ -30,40 +30,18 @@ public class LogHandler {
             e.printStackTrace();
         }
 
-
-        /*while (iteratorExit.hasNext()) {
-            String recordStr = iteratorExit.next();
-            Record record = Parser.parse(recordStr);
-            if (id.equals(record.getId()) && record.getAction() == Action.EXIT) {
-                return record;
-            }
-        }*/
         return null;
     }
 
-    public static void collectStatistics(Path logPath) {
-        /*//TODO think about hot file changes
-        Iterator<String> iteratorEnter = Files.lines(logPath).iterator();
-        Iterator<String> iteratorExit = Files.lines(logPath).iterator();
-        while (iteratorEnter.hasNext()) {
-            String enterStr = iteratorEnter.next();
-            Record enter = Parser.parse(enterStr);
-            if (enter.getAction() == Action.ENTRY) {
-                Record exit = LogHandler.getExit(iteratorExit, enter.getId());
-                StatisticsHandler.collect(enter, exit);
-            }
-        }*/
-//                FileReader fileReader = new FileReader(logPath.toFile());
-//        StringReader stringReader = new StringReader();
-//                stringReader.re
+    public static void collectStatistics(Path logPath) throws InterruptedException {
+        //TODO think about hot file changes
         try (BufferedReader bufferedReader = Files.newBufferedReader(logPath)) {
             long passed = 0;
             String line;
             while ((line = bufferedReader.readLine()) != null) { //EOF
-                passed += line.length() + LINE_TERMINATION_CHARS_LEN; //FIXME last line
+                passed += line.length() + LINE_TERMINATION_CHARS_LEN;
                 Record enter = Parser.parse(line);
                 if (enter.getAction() == Action.ENTRY) {
-//                bufferedReader.mark(0);//TODO counter+skip?
                     final long finalPassed = passed;
                     threadPool.submit(() -> {
                         Record exit = getExit(logPath, finalPassed, enter.getId());
@@ -71,19 +49,11 @@ public class LogHandler {
                     });
                 }
             }
-            threadPool.awaitTermination(1, TimeUnit.HOURS);
-            threadPool.shutdown();
-
-        } catch (IOException | LogRecordFormatException | InterruptedException e) {
+        } catch (IOException | LogRecordFormatException e) {
             e.printStackTrace();
+        } finally {
+            threadPool.shutdown();
+            threadPool.awaitTermination(1, TimeUnit.HOURS);
         }
-
-            /*lines.forEach(s -> {
-                        Record record = Parser.parse(s);
-                        if (record.getAction() == Action.ENTRY) {
-                            LogHandler.getExit(, record.getId());
-                        }
-                    }
-            );*/
     }
 }

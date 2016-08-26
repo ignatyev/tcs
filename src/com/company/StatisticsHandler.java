@@ -17,7 +17,8 @@ public class StatisticsHandler {
         String method = enter.getMethod();
         Stats stats = statsMap.get(method);
         if (stats == null) {
-            statsMap.put(method, new Stats(durationMillis, durationMillis, durationMillis, 1, durationMillis, enter.getId()));
+            statsMap.put(method,
+                    new Stats(durationMillis, durationMillis, durationMillis, 1, durationMillis, enter.getId()));
             return;
         }
 //TODO sync
