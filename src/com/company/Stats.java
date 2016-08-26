@@ -20,6 +20,18 @@ public class Stats {
         this.idOfMax = idOfMax;
     }
 
+    @Override
+    public String toString() {
+        return "Stats{" +
+                "min=" + min +
+                ", max=" + max +
+                ", avg=" + avg +
+                ", idOfMax='" + idOfMax + '\'' +
+                ", count=" + count +
+                ", sum=" + sum +
+                '}';
+    }
+
     public long getMin() {
         return min;
     }
