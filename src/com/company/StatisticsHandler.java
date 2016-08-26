@@ -15,24 +15,24 @@ public class StatisticsHandler {
         if (exit == null || enter == null) return;
         long durationMillis = Duration.between(enter.getTime(), exit.getTime()).toMillis();
         String method = enter.getMethod();
-        Stats stats = statsMap.get(method);
+        Stats stats = statsMap.putIfAbsent(method,
+                new Stats(durationMillis, durationMillis, durationMillis, 1, durationMillis, enter.getId()));
         if (stats == null) {
-            statsMap.put(method,
-                    new Stats(durationMillis, durationMillis, durationMillis, 1, durationMillis, enter.getId()));
             return;
         }
-//TODO sync
-        stats.setCount(stats.getCount() + 1);
-        stats.setSum(stats.getSum() + durationMillis);
-        stats.setAvg((float) stats.getSum() / stats.getCount());
-        if (durationMillis < stats.getMin()) {
-            stats.setMin(durationMillis);
-        }
-        if (durationMillis > stats.getMax()) {
-            stats.setMax(durationMillis);
-            stats.setIdOfMax(enter.getId());
-        }
 
+        synchronized (stats) {
+            stats.setCount(stats.getCount() + 1);
+            stats.setSum(stats.getSum() + durationMillis);
+            stats.setAvg((float) stats.getSum() / stats.getCount());
+            if (durationMillis < stats.getMin()) {
+                stats.setMin(durationMillis);
+            }
+            if (durationMillis > stats.getMax()) {
+                stats.setMax(durationMillis);
+                stats.setIdOfMax(enter.getId());
+            }
+        }
     }
 
     public static Map<String, Stats> getStatistics() {
