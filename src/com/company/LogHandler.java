@@ -9,6 +9,9 @@ import java.nio.file.Path;
  * Created by AnVIgnatev on 26.08.2016.
  */
 public class LogHandler {
+
+    public static final int LINE_TERMINATION_CHARS_LEN = 2;
+
     private static Record getExit(Path log, long passed, String id) throws LogRecordFormatException {
         try (BufferedReader bufferedReader = Files.newBufferedReader(log)) {
             bufferedReader.skip(passed);
@@ -43,7 +46,7 @@ public class LogHandler {
             Record enter = Parser.parse(enterStr);
             if (enter.getAction() == Action.ENTRY) {
                 Record exit = LogHandler.getExit(iteratorExit, enter.getId());
-                Statistics.collect(enter, exit);
+                StatisticsHandler.collect(enter, exit);
             }
         }*/
 //                FileReader fileReader = new FileReader(logPath.toFile());
@@ -53,13 +56,13 @@ public class LogHandler {
             long passed = 0;
             String line;
             while ((line = bufferedReader.readLine()) != null) { //EOF
-                passed += line.length() + 2; //todo add line-termination chars
+                passed += line.length() + LINE_TERMINATION_CHARS_LEN; //FIXME last line
                 Record enter = Parser.parse(line);
                 if (enter.getAction() == Action.ENTRY) {
 //                bufferedReader.mark(0);//TODO counter+skip?
 
                     Record exit = getExit(logPath, passed, enter.getId());
-                    Statistics.collect(enter, exit);
+                    StatisticsHandler.collect(enter, exit);
                 }
             }
         } catch (IOException | LogRecordFormatException e) {

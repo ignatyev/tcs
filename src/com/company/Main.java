@@ -20,5 +20,6 @@ public class Main {
             System.exit(0);
         }
         LogHandler.collectStatistics(logPath);
+        System.out.println(StatisticsHandler.getStatistics());
     }
 }
