@@ -1,16 +1,15 @@
 package com.company;
 
 import java.time.Duration;
-import java.time.temporal.ChronoField;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by AnVIgnatev on 26.08.2016.
  */
 public class StatisticsHandler {
-    private static Map<String, Stats> statsMap = new HashMap<>();
+    private static Map<String, Stats> statsMap = new ConcurrentHashMap<>();
 
     public static void collect(Record enter, Record exit) {
         if (exit == null || enter == null) return;
@@ -21,7 +20,7 @@ public class StatisticsHandler {
             statsMap.put(method, new Stats(durationMillis, durationMillis, durationMillis, 1, durationMillis, enter.getId()));
             return;
         }
-
+//TODO sync
         stats.setCount(stats.getCount() + 1);
         stats.setSum(stats.getSum() + durationMillis);
         stats.setAvg((float) stats.getSum() / stats.getCount());

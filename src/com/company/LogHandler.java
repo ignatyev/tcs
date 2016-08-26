@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by AnVIgnatev on 26.08.2016.
@@ -11,8 +14,9 @@ import java.nio.file.Path;
 public class LogHandler {
 
     public static final int LINE_TERMINATION_CHARS_LEN = 2;
+    private static ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-    private static Record getExit(Path log, long passed, String id) throws LogRecordFormatException {
+    private static Record getExit(Path log, long passed, String id) {
         try (BufferedReader bufferedReader = Files.newBufferedReader(log)) {
             bufferedReader.skip(passed);
             String line;
@@ -22,7 +26,7 @@ public class LogHandler {
                     return record;
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | LogRecordFormatException e) {
             e.printStackTrace();
         }
 
@@ -60,12 +64,17 @@ public class LogHandler {
                 Record enter = Parser.parse(line);
                 if (enter.getAction() == Action.ENTRY) {
 //                bufferedReader.mark(0);//TODO counter+skip?
-
-                    Record exit = getExit(logPath, passed, enter.getId());
-                    StatisticsHandler.collect(enter, exit);
+                    final long finalPassed = passed;
+                    threadPool.submit(() -> {
+                        Record exit = getExit(logPath, finalPassed, enter.getId());
+                        StatisticsHandler.collect(enter, exit);
+                    });
                 }
             }
-        } catch (IOException | LogRecordFormatException e) {
+            threadPool.awaitTermination(1, TimeUnit.HOURS);
+            threadPool.shutdown();
+
+        } catch (IOException | LogRecordFormatException | InterruptedException e) {
             e.printStackTrace();
         }
 
