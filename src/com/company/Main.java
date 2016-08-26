@@ -19,16 +19,6 @@ public class Main {
             System.out.println("Could not read log file by path: " + logPath);
             System.exit(0);
         }
-//        FileReader fileReader = new FileReader(logPath.toFile());
-//        StringReader stringReader = new StringReader();
-//                stringReader.re
         LogHandler.collectStatistics(logPath);
-/*
-        try (BufferedReader bufferedReader = Files.newBufferedReader(logPath)) {
-            String s = bufferedReader.readLine();
-            Record record = Parser.parse(s);
-        } catch (IOException | LogRecordFormatException e) {
-            e.printStackTrace();
-        }*/
     }
 }

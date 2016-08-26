@@ -1,38 +1,71 @@
 package com.company;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Iterator;
 
 /**
  * Created by AnVIgnatev on 26.08.2016.
  */
 public class LogHandler {
-    private static Record getExit(Iterator<String> iteratorExit, String id) throws LogRecordFormatException {
-        while (iteratorExit.hasNext()) {
+    private static Record getExit(Path log, long passed, String id) throws LogRecordFormatException {
+        try (BufferedReader bufferedReader = Files.newBufferedReader(log)) {
+            bufferedReader.skip(passed);
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                Record record = Parser.parse(line);
+                if (id.equals(record.getId()) && record.getAction() == Action.EXIT) {
+                    return record;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        /*while (iteratorExit.hasNext()) {
             String recordStr = iteratorExit.next();
             Record record = Parser.parse(recordStr);
             if (id.equals(record.getId()) && record.getAction() == Action.EXIT) {
                 return record;
             }
-        }
+        }*/
         return null;
     }
 
     public static void collectStatistics(Path logPath) {
-        try {
-            //TODO think about hot file changes
-            Iterator<String> iteratorEnter = Files.lines(logPath).iterator();
-            Iterator<String> iteratorExit = Files.lines(logPath).iterator();
-            while (iteratorEnter.hasNext()) {
-                String enterStr = iteratorEnter.next();
-                Record enter = Parser.parse(enterStr);
+        /*//TODO think about hot file changes
+        Iterator<String> iteratorEnter = Files.lines(logPath).iterator();
+        Iterator<String> iteratorExit = Files.lines(logPath).iterator();
+        while (iteratorEnter.hasNext()) {
+            String enterStr = iteratorEnter.next();
+            Record enter = Parser.parse(enterStr);
+            if (enter.getAction() == Action.ENTRY) {
+                Record exit = LogHandler.getExit(iteratorExit, enter.getId());
+                Statistics.collect(enter, exit);
+            }
+        }*/
+//                FileReader fileReader = new FileReader(logPath.toFile());
+//        StringReader stringReader = new StringReader();
+//                stringReader.re
+        try (BufferedReader bufferedReader = Files.newBufferedReader(logPath)) {
+            long passed = 0;
+            String line;
+            while ((line = bufferedReader.readLine()) != null) { //EOF
+                passed += line.length() + 2; //todo add line-termination chars
+                Record enter = Parser.parse(line);
                 if (enter.getAction() == Action.ENTRY) {
-                    Record exit = LogHandler.getExit(iteratorExit, enter.getId());
+//                bufferedReader.mark(0);//TODO counter+skip?
+
+                    Record exit = getExit(logPath, passed, enter.getId());
                     Statistics.collect(enter, exit);
                 }
             }
+        } catch (IOException | LogRecordFormatException e) {
+            e.printStackTrace();
+        }
+
             /*lines.forEach(s -> {
                         Record record = Parser.parse(s);
                         if (record.getAction() == Action.ENTRY) {
@@ -40,8 +73,5 @@ public class LogHandler {
                         }
                     }
             );*/
-        } catch (IOException | LogRecordFormatException e) {
-            e.printStackTrace();
-        }
     }
 }
