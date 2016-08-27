@@ -28,6 +28,5 @@ public class Main {
             e.printStackTrace();
         }
         System.out.println("Work time: " + Duration.between(start, LocalDateTime.now()).toMillis());
-        System.out.println(StatisticsHandler.getStatistics());
     }
 }
