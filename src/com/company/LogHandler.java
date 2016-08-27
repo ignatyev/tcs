@@ -38,9 +38,10 @@ public class LogHandler {
                 stringMapEntry.getValue().entrySet().forEach(stringListEntry -> {
                     String id = stringListEntry.getKey();
                     List<Record> records = stringListEntry.getValue();
+                    if (records.size() != 2) return;
                     OptionalLong duration = records.stream()
                             .mapToLong(record -> record.getTime().toInstant(ZoneOffset.UTC).toEpochMilli())
-                            .reduce((enter, exit) -> Math.abs(enter - exit)); //FIXME if there's no exit
+                            .reduce((enter, exit) -> Math.abs(enter - exit));
                     duration.ifPresent(value -> methodsDurations.get(method).put(id, value));
                 });
             });
@@ -51,7 +52,7 @@ public class LogHandler {
                 LongStream longStream = stringMapEntry.getValue().entrySet().stream()
                         .mapToLong(Map.Entry::getValue);
                 System.out.println(stringMapEntry.getKey());
-                max.ifPresent((entry) -> System.out.println(entry.getKey()));
+                max.ifPresent(System.out::println);
                 System.out.println(longStream.summaryStatistics());
             });
         } catch (IOException e) {
