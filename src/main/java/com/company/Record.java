@@ -4,14 +4,12 @@ import java.time.LocalDateTime;
 
 public class Record {
     private final LocalDateTime time;
-    private final String clazz;
     private final Action action;
     private final String method;
     private final String id;
 
-    public Record(LocalDateTime time, String clazz, Action action, String method, String id) {
+    public Record(LocalDateTime time, Action action, String method, String id) {
         this.time = time;
-        this.clazz = clazz;
         this.action = action;
         this.method = method;
         this.id = id;
@@ -19,10 +17,6 @@ public class Record {
 
     public LocalDateTime getTime() {
         return time;
-    }
-
-    public String getClazz() {
-        return clazz;
     }
 
     public Action getAction() {
