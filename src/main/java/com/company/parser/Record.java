@@ -1,4 +1,4 @@
-package com.company;
+package com.company.parser;
 
 import java.time.LocalDateTime;
 
