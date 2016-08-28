@@ -1,6 +1,6 @@
 package com.company;
 
-import com.company.statistics.InMemory;
+import com.company.statistics.inmemory.InMemory;
 import com.company.statistics.linebyline.LineByLine;
 
 import java.io.IOException;

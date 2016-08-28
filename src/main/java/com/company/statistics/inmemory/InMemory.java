@@ -1,4 +1,4 @@
-package com.company.statistics;
+package com.company.statistics.inmemory;
 
 import com.company.parser.Parser;
 import com.company.parser.Record;
