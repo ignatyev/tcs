@@ -1,0 +1,18 @@
+The application parses log file of records like:
+
+2015-10-28T12:19:47,036 TRACE [OperationsImpl] entry with (acceptToken:97822)
+
+2015-10-28T12:24:52,178 TRACE [OperationsImpl] entry with (getActions:97978)
+
+2015-10-28T12:24:51,338 TRACE [OperationsImpl] exit with (acceptToken:97822)
+
+The log contains entries "entry with (addContact:4426…" and exits "exit with (addContact:4426…" to\from different methods. Here: addContact – method name, 4426 – ID of the particular call of addContact.
+
+The application shows statistics for each method:
+
+min call time
+max call time
+avg call time
+calls count
+id of the max call
+Extremely large files are operated using line-by-line reading (works slowly).
